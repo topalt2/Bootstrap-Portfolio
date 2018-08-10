@@ -1,150 +1,178 @@
-window.onload = function() {
-    $("#lap").on("click", stopwatch.recordLap);
-    $("#stop").on("click", stopwatch.stop);
-    $("#reset").on("click", stopwatch.reset);
-    $("#start").on("click", stopwatch.start);
-  };
+$(document).ready(function(){
   
-  //  Variable that will hold our setInterval that runs the stopwatch
-  var intervalId;
+  // event listeners
+  $("#remaining-time").hide();
+  $("#start").on('click', trivia.startGame);
+  $(document).on('click' , '.option', trivia.guessChecker);
   
-  // prevents the clock from being sped up unnecessarily
-  var clockRunning = false;
-  
-  // Our stopwatch object
-  var stopwatch = {
-  
-    time: 0,
-    lap: 1,
-  
-    reset: function() {
-  
-      stopwatch.time = 0;
-      stopwatch.lap = 1;
-  
-      // DONE: Change the "display" div to "00:00."
-      $("#display").text("00:00");
-  
-      // DONE: Empty the "laps" div.
-      $("#laps").text("");
-    },
-    start: function() {
-  
-      // DONE: Use setInterval to start the count here and set the clock to running.
-      if (!clockRunning) {
-        intervalId = setInterval(stopwatch.count, 1000);
-        clockRunning = true;
-      }
-    },
-    stop: function() {
-  
-      // DONE: Use clearInterval to stop the count here and set the clock to not be running.
-      clearInterval(intervalId);
-      clockRunning = false;
-    },
-    recordLap: function() {
-  
-      // DONE: Get the current time, pass that into the stopwatch.timeConverter function,
-      //       and save the result in a variable.
-      var converted = stopwatch.timeConverter(stopwatch.time);
-  
-      // DONE: Add the current lap and time to the "laps" div.
-      $("#laps").append("<p>Lap " + stopwatch.lap + " : " + converted + "</p>");
-  
-      // DONE: Increment lap by 1. Remember, we can't use "this" here.
-      stopwatch.lap++;
-    },
-    count: function() {
-  
-      // DONE: increment time by 1, remember we cant use "this" here.
-      stopwatch.time++;
-  
-      // DONE: Get the current time, pass that into the stopwatch.timeConverter function,
-      //       and save the result in a variable.
-      var converted = stopwatch.timeConverter(stopwatch.time);
-      console.log(converted);
-  
-      // DONE: Use the variable we just created to show the converted time in the "display" div.
-      $("#display").text(converted);
-    },
-    timeConverter: function(t) {
-  
-      var minutes = Math.floor(t / 60);
-      var seconds = t - (minutes * 60);
-  
-      if (seconds < 10) {
-        seconds = "0" + seconds;
-      }
-  
-      if (minutes === 0) {
-        minutes = "00";
-      }
-      else if (minutes < 10) {
-        minutes = "0" + minutes;
-      }
-  
-      return minutes + ":" + seconds;
+})
+
+var trivia = {
+  // trivia properties
+  correct: 0,
+  incorrect: 0,
+  unanswered: 0,
+  currentSet: 0,
+  timer: 20,
+  timerOn: false,
+  timerId : '',
+  // questions options and answers data
+  questions: {
+    q1: 'what is the only mammal that can fly?',
+    q2: 'Fastest animal on land?',
+    q3: 'What is the largest fish in the world?',
+    q4: 'How many different species of shark are there?',
+    q5: "What is the bird with the longest lifespan?",
+  },
+  options: {
+    q1: ['pigeon', 'ostritch', 'zebra', 'bat'],
+    q2: ['Tiger', 'antelope', 'car', 'cheetah'],
+    q3: ['goldfish', 'swordfish', 'whaleshark', 'angler'],
+    q4: ['5', '440', '24', '150'],
+    q5: ['parrot','woodpecker','robin','hummingbird'],
+  },
+  answers: {
+    q1: 'bat',
+    q2: 'cheetah',
+    q3: 'whaleshark',
+    q4: '440',
+    q5: 'parrot',
+  },
+  // trivia methods
+  // method to initialize game
+  startGame: function(){
+    // restarting game results
+    trivia.currentSet = 0;
+    trivia.correct = 0;
+    trivia.incorrect = 0;
+    trivia.unanswered = 0;
+    clearInterval(trivia.timerId);
+    
+    // show game section
+    $('#game').show();
+    
+    //  empty last results
+    $('#results').html('');
+    
+    // show timer
+    $('#timer').text(trivia.timer);
+    
+    // remove start button
+    $('#start').hide();
+
+    $('#remaining-time').show();
+    
+    // ask first question
+    trivia.nextQuestion();
+    
+  },
+  // method to loop through and display questions and options 
+  nextQuestion : function(){
+    
+    // set timer to 20 seconds each question
+    trivia.timer = 10;
+     $('#timer').removeClass('last-seconds');
+    $('#timer').text(trivia.timer);
+    
+    // to prevent timer speed up
+    if(!trivia.timerOn){
+      trivia.timerId = setInterval(trivia.timerRunning, 1000);
     }
-  };
-  
-  
-  // Solution if you choose not to put it in an object
-  
-  // var time = 0;
-  // var lap = 1;
-  // function reset() {
-  
-  //   time = 0;
-  //   lap = 1;
-  
-  //   $("#display").text("00:00");
-  //   $("#laps").text("");
-  
-  // }
-  
-  // function start() {
-  //   intervalId = setInterval(count, 1000);
-  // }
-  
-  // function stop() {
-  
-  //   console.log("stopping");
-  //   clearInterval(intervalId);
-  
-  // }
-  
-  // function recordLap() {
-  
-  //   var converted = timeConverter(time);
-  //   $("#laps").append("<p>Lap " + lap + " : " + converted + "</p>");
-  //   lap++;
-  
-  // }
-  
-  // function count() {
-  
-  //   time++;
-  //   var converted = timeConverter(time);
-  //   $("#display").text(converted);
-  
-  // }
-  
-  // function timeConverter(t) {
-  
-  //   var minutes = Math.floor(t / 60);
-  //   var seconds = t - (minutes * 60);
-  
-  //   if (seconds < 10) {
-  //     seconds = "0" + seconds;
-  //   }
-  
-  //   if (minutes === 0) {
-  //     minutes = "00";
-  //   }
-  //   else if (minutes < 10) {
-  //     minutes = "0" + minutes;
-  //   }
-  
-  //   return minutes + ":" + seconds;
-  // }
-  
+    
+    // gets all the questions then indexes the current questions
+    var questionContent = Object.values(trivia.questions)[trivia.currentSet];
+    $('#question').text(questionContent);
+    
+    // an array of all the user options for the current question
+    var questionOptions = Object.values(trivia.options)[trivia.currentSet];
+    
+    // creates all the trivia guess options in the html
+    $.each(questionOptions, function(index, key){
+      $('#options').append($('<button class="option btn btn-info btn-lg">'+key+'</button>'));
+    })
+    
+  },
+  // method to decrement counter and count unanswered if timer runs out
+  timerRunning : function(){
+    // if timer still has time left and there are still questions left to ask
+    if(trivia.timer > -1 && trivia.currentSet < Object.keys(trivia.questions).length){
+      $('#timer').text(trivia.timer);
+      trivia.timer--;
+        if(trivia.timer === 4){
+          $('#timer').addClass('last-seconds');
+        }
+    }
+    // the time has run out and increment unanswered, run result
+    else if(trivia.timer === -1){
+      trivia.unanswered++;
+      trivia.result = false;
+      clearInterval(trivia.timerId);
+      resultId = setTimeout(trivia.guessResult, 1000);
+      $('#results').html('<h3>Out of time! The answer was '+ Object.values(trivia.answers)[trivia.currentSet] +'</h3>');
+    }
+    // if all the questions have been shown end the game, show results
+    else if(trivia.currentSet === Object.keys(trivia.questions).length){
+      
+      // adds results of game (correct, incorrect, unanswered) to the page
+      $('#results')
+        .html('<h3>Thank you for playing!</h3>'+
+        '<p>Correct: '+ trivia.correct +'</p>'+
+        '<p>Incorrect: '+ trivia.incorrect +'</p>'+
+        '<p>Unaswered: '+ trivia.unanswered +'</p>'+
+        '<p>Please play again!</p>');
+      
+      // hide game sction
+      $('#game').hide();
+      
+      // show start button to begin a new game
+      $('#start').show();
+    }
+    
+  },
+  // method to evaluate the option clicked
+  guessChecker : function() {
+    
+    // timer ID for gameResult setTimeout
+    var resultId;
+    
+    // the answer to the current question being asked
+    var currentAnswer = Object.values(trivia.answers)[trivia.currentSet];
+    
+    // if the text of the option picked matches the answer of the current question, increment correct
+    if($(this).text() === currentAnswer){
+      // turn button green for correct
+      $(this).addClass('btn-success').removeClass('btn-info');
+      
+      trivia.correct++;
+      clearInterval(trivia.timerId);
+      resultId = setTimeout(trivia.guessResult, 1000);
+      $('#results').html('<h3>Correct Answer!</h3>');
+    }
+    // else the user picked the wrong option, increment incorrect
+    else{
+      // turn button clicked red for incorrect
+      $(this).addClass('btn-danger').removeClass('btn-info');
+      
+      trivia.incorrect++;
+      clearInterval(trivia.timerId);
+      resultId = setTimeout(trivia.guessResult, 1000);
+      $('#results').html('<h3>Better luck next time! '+ currentAnswer +'</h3>');
+    }
+    
+  },
+  // method to remove previous question results and options
+  guessResult : function(){
+    
+    // increment to next question set
+    trivia.currentSet++;
+    
+    // remove the options and results
+    $('.option').remove();
+    $('#results h3').remove();
+    
+    // begin next question
+    trivia.nextQuestion();
+     
+  }
+
+}
